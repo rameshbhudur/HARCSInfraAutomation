@@ -1,0 +1,4 @@
+git clone https://github.com/rameshbhudur/HARCSInfraAutomation.git
+git add * or git add "filename"
+git commit -m "message"
+git push origin master

@@ -1,0 +1,173 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Unison Stack"
+
+# Stack Parameters
+Parameters:
+  VpcId: 
+    Type: "AWS::EC2::VPC::Id"
+    Description: "The target VPC Id"
+  SubnetId:
+    Type: "AWS::EC2::Subnet::Id"
+    Description: "The target Subnet Id in Availability Zone a"
+  KeyPair:
+    Type: "String"
+    Description: "The key pair that is allowed SSH access"
+  InstanceCount:
+    Type: "Number"
+    Description: "The desired number of application instances"
+  DbSubnets:
+    Type: "List<AWS::EC2::Subnet::Id>"
+    Description: "The target DB Subnet Group subnet Ids"
+  DbAvailabilityZone:
+    Type: "String"
+    Description: "The target availability zone for the database instance"
+  DbUsername:
+    Type: "String"
+    Description: "The RDS database username"
+  DbPassword:
+    Type: "String"
+    Description: "The RDS database password"
+    NoEcho: "true"
+
+# Stack Resources
+Resources:
+  AutoScalingGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      VPCZoneIdentifier: [ { "Ref": "SubnetId" } ]
+      LaunchConfigurationName: { "Ref": "AutoScalingLaunchConfiguration" }
+      MinSize: 0
+      MaxSize: 2
+      DesiredCapacity: { "Ref": "InstanceCount" }
+      Tags:
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-instance" ] ] }
+          PropagateAtLaunch: "true"
+  AutoScalingLaunchConfiguration:
+    Type: "AWS::AutoScaling::LaunchConfiguration"
+    Properties:
+      ImageId: ami-cf6342ac
+      InstanceType: t2.micro
+      KeyName: { "Ref": "KeyPair" }
+      IamInstanceProfile: { "Ref": "EC2InstanceProfile" }
+      SecurityGroups:
+        - { "Ref": "EC2InstanceSecurityGroup" }
+      UserData: {
+        "Fn::Base64": { "Fn::Join": ["", [
+          "#!/bin/bash\n",
+          "yum update -y"
+        ] ] }
+      }
+  EC2InstanceSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties: 
+      GroupDescription: "todobackend-sg"
+      VpcId: { "Ref": "VpcId" }
+      SecurityGroupIngress: 
+        - IpProtocol: "tcp"
+          FromPort: "8000"
+          ToPort: "8000"
+          SourceSecurityGroupId: { "Ref": "ElbSecurityGroup" }
+        - IpProtocol: "tcp"
+          FromPort: "22"
+          ToPort: "22"
+          CidrIp: "0.0.0.0/0"
+      Tags: 
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-instance-sg" ] ] }
+  EC2InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Path: "/"
+      Roles: [ { "Ref": "EC2InstanceRole" } ]
+  EC2InstanceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument: {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": { "Service": [ "ec2.amazonaws.com" ] },
+            "Action": [ "sts:AssumeRole" ]
+          }
+        ]
+      }
+      Path: "/"
+      ManagedPolicyArns: 
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"     
+  DbInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBSubnetGroupName: { "Ref": "DbSubnetGroup" }
+      MultiAZ: "false"
+      AvailabilityZone: { "Ref": "DbAvailabilityZone" }
+      AllocatedStorage: 8
+      StorageType: "gp2"
+      DBInstanceClass: "db.t2.micro"
+      DBName: "Unison"
+      Engine: "MySQL"
+      EngineVersion: "5.6"
+      MasterUsername: { "Ref": "DbUsername" }
+      MasterUserPassword: { "Ref": "DbPassword" }
+      VPCSecurityGroups:
+        - { "Ref": "DbSecurityGroup" }
+      Tags:
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-db" ] ] }
+  DbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties: 
+      GroupDescription: "Todobackend DB Security Group"
+      VpcId: { "Ref": "VpcId"}
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: "3306"
+          ToPort: "3306"
+          SourceSecurityGroupId: { "Ref": "EC2InstanceSecurityGroup" }        
+  DbSubnetGroup: 
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupDescription: "Todobackend DB Subnet Group"
+      SubnetIds: { "Ref": "DbSubnets" }
+      Tags: 
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-db-subnet-group" ] ] }
+  ElasticLoadBalancer:
+    Type: "AWS::ElasticLoadBalancing::LoadBalancer"
+    Properties:
+      CrossZone: "false"
+      SecurityGroups: [ { "Ref": "ElbSecurityGroup" } ]
+      Listeners:
+        - LoadBalancerPort: "80"
+          InstancePort: "8000"
+          Protocol: "http"
+      HealthCheck: 
+        Target: "HTTP:8000/todos"
+        HealthyThreshold: "2"
+        UnhealthyThreshold: "10"
+        Interval: "30"
+        Timeout: "5"
+      Subnets: [ { "Ref": "SubnetId" } ]
+      Tags: 
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-elb" ] ] }
+  ElbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Todobackend ELB Security Group"
+      VpcId: { "Ref": "VpcId" }
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: "80"
+          ToPort: "80"
+          CidrIp: "0.0.0.0/0"
+      Tags: 
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-elb-sg" ] ] }
+
+# Stack Outputs
+Outputs:
+  ElbDomainName: 
+    Description: "Public DNS name of Elastic Load Balancer"
+    Value: { "Fn::GetAtt": [ "ElasticLoadBalancer", "DNSName" ] }

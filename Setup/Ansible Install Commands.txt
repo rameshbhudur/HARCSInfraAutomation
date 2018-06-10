@@ -1,0 +1,4 @@
+Yum install -y python
+pip install ansible --upgrade
+pip install boto boto3 - it is python SDK for ansible to communicate with AWS
+pip install awcli
