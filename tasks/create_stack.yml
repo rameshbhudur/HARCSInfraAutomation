@@ -3,7 +3,7 @@
   cloudformation:
     stack_name: Unison
     state: present
-    template: templates/stack.yml
+    template: templates/Stack.yml
     template_format: yaml
     template_parameters:
       VpcId: "{{ vpc_id }}"
