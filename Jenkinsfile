@@ -2,8 +2,5 @@ node {
   checkout scm
 
   stage 'Deploy application Stack'
-  //withEnv(["VAULT_PASSWORD=${VAULT_PASSWORD}"]) {
-    sh '/usr/local/bin/ansible/ansible-playbook site.yml'
-  //}
-  //ansiblePlaybook 'site.yml'
+  ansiblePlaybook installation: 'Ansible2.2.0', playbook: '${WORKSPACE}/site.yml'
 }
