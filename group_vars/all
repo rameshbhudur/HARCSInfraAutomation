@@ -1,11 +1,11 @@
 ---
-vpc_id: vpc-675c2902
-subnet_id: subnet-8ae2a6fd
-ec2_keypair: admin
+vpc_id: vpc-e2918d86
+subnet_id: subnet-2e4c7277
+ec2_keypair: MyWebServer
 instance_count: 2
 db_subnets:
-  - subnet-8ae2a6fd
-  - subnet-37633d52
+  - subnet-2e4c7277
+  - subnet-53c6161a
 db_availability_zone: ap-southeast-2a
 db_username: unison
 db_password: unison
