@@ -148,7 +148,7 @@ Resources:
         UnhealthyThreshold: "10"
         Interval: "30"
         Timeout: "5"
-      Subnets: [ { "Ref": "SubnetId" } ]
+      Subnets: { "Ref": "SubnetId" }
       Tags: 
         - Key: "Name"
           Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-elb" ] ] }
