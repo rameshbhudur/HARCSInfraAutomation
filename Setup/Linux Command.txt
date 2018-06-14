@@ -1,0 +1,3 @@
+sudo cat /var/log/secure|grep sshd
+sudo usermod -a -G root jenkins
+sudo service jenkins restart

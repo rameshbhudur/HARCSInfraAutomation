@@ -7,7 +7,7 @@
     template_format: yaml
     template_parameters:
       VpcId: "{{ vpc_id }}"
-      SubnetId: "{{ subnet_id }}"
+      SubnetId: "{{ subnet_id | join(',') }}"
       DbSubnets: "{{ db_subnets | join(',') }}"
       KeyPair: "{{ ec2_keypair }}"
       DbUsername: "{{ db_username }}"
