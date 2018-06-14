@@ -7,8 +7,8 @@ Parameters:
     Type: "AWS::EC2::VPC::Id"
     Description: "The target VPC Id"
   SubnetId:
-    Type: "AWS::EC2::Subnet::Id"
-    Description: "The target Subnet Id in Availability Zone a"
+    Type: "List<AWS::EC2::Subnet::Id>"
+    Description: "The target Subnet Id in Availability Zones"
   KeyPair:
     Type: "String"
     Description: "The key pair that is allowed SSH access"
@@ -34,7 +34,7 @@ Resources:
   AutoScalingGroup:
     Type: "AWS::AutoScaling::AutoScalingGroup"
     Properties:
-      VPCZoneIdentifier: [ { "Ref": "SubnetId" } ]
+      VPCZoneIdentifier: { "Ref": "SubnetId" }
       LaunchConfigurationName: { "Ref": "AutoScalingLaunchConfiguration" }
       MinSize: 0
       MaxSize: 2
