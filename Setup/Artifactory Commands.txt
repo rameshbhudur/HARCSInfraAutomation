@@ -1,0 +1,15 @@
+wget https://bintray.com/jfrog/artifactory-pro-rpms/rpm -O bintray-jfrog-artifactory-pro-rpms.repo
+sudo mv bintray-jfrog-artifactory-pro-rpms.repo /etc/yum.repos.d/
+yum install jfrog-artifactory-pro
+
+service artifactory check
+service artifactory start
+
+Using ARTIFACTORY_HOME: /var/opt/jfrog/artifactory
+Using ARTIFACTORY_PID: /var/opt/jfrog/run/artifactory.pid
+Using CATALINA_BASE:   /opt/jfrog/artifactory/tomcat
+Using CATALINA_HOME:   /opt/jfrog/artifactory/tomcat
+Using CATALINA_TMPDIR: /opt/jfrog/artifactory/tomcat/temp
+Using JRE_HOME:        /usr
+Using CLASSPATH:       /opt/jfrog/artifactory/tomcat/bin/bootstrap.jar:/opt/jfrog/artifactory/tomcat/bin/tomcat-juli.jar
+Using CATALINA_PID:    /var/opt/jfrog/run/artifactory.pid

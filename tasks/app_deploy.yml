@@ -1,0 +1,16 @@
+---
+- name: Deploy Web Application Server
+  yum: name={{ item }} state=present
+  with_items:
+    - httpd
+
+- name: Install git
+  yum: name={{ item }} state=installed
+  with_items:
+   - git
+
+- name: http service state
+  service: name=httpd state=started enabled=yes
+
+- name: Copy the code from repository
+  git: repo={{ repository }} dest=/var/www/html/

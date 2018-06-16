@@ -13,3 +13,4 @@ db_subnets:
 db_availability_zone: ap-southeast-2a
 db_username: unison
 db_password: Henith*11
+repository: https://github.com/rameshbhudur/SampleJavaApplication.git
