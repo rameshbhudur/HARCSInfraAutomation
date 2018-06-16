@@ -61,12 +61,12 @@ Resources:
   EC2InstanceSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties: 
-      GroupDescription: "Unison-sg"
+      GroupDescription: "todobackend-sg"
       VpcId: { "Ref": "VpcId" }
       SecurityGroupIngress: 
-        - IpProtocol: "http"
-          FromPort: "80"
-          ToPort: "80"
+        - IpProtocol: "tcp"
+          FromPort: "8000"
+          ToPort: "8000"
           SourceSecurityGroupId: { "Ref": "ElbSecurityGroup" }
         - IpProtocol: "tcp"
           FromPort: "22"
@@ -96,7 +96,43 @@ Resources:
       Path: "/"
       ManagedPolicyArns: 
         - "arn:aws:iam::aws:policy/AmazonS3FullAccess"     
-  
+  DbInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBSubnetGroupName: { "Ref": "DbSubnetGroup" }
+      MultiAZ: "false"
+      AvailabilityZone: { "Ref": "DbAvailabilityZone" }
+      AllocatedStorage: 8
+      StorageType: "gp2"
+      DBInstanceClass: "db.t2.micro"
+      DBName: "Unison"
+      Engine: "MySQL"
+      EngineVersion: "5.6"
+      MasterUsername: { "Ref": "DbUsername" }
+      MasterUserPassword: { "Ref": "DbPassword" }
+      VPCSecurityGroups:
+        - { "Ref": "DbSecurityGroup" }
+      Tags:
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-db" ] ] }
+  DbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties: 
+      GroupDescription: "Todobackend DB Security Group"
+      VpcId: { "Ref": "VpcId"}
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: "3306"
+          ToPort: "3306"
+          SourceSecurityGroupId: { "Ref": "EC2InstanceSecurityGroup" }        
+  DbSubnetGroup: 
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupDescription: "Todobackend DB Subnet Group"
+      SubnetIds: { "Ref": "DbSubnets" }
+      Tags: 
+        - Key: "Name"
+          Value: { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-db-subnet-group" ] ] }
   ElasticLoadBalancer:
     Type: "AWS::ElasticLoadBalancing::LoadBalancer"
     Properties:
@@ -104,10 +140,10 @@ Resources:
       SecurityGroups: [ { "Ref": "ElbSecurityGroup" } ]
       Listeners:
         - LoadBalancerPort: "80"
-          InstancePort: "80"
+          InstancePort: "8000"
           Protocol: "http"
       HealthCheck: 
-        Target: "HTTP:80/index.html"
+        Target: "HTTP:8000/todos"
         HealthyThreshold: "2"
         UnhealthyThreshold: "10"
         Interval: "30"
@@ -119,10 +155,10 @@ Resources:
   ElbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: "ELB Security Group"
+      GroupDescription: "Todobackend ELB Security Group"
       VpcId: { "Ref": "VpcId" }
       SecurityGroupIngress:
-        - IpProtocol: "http"
+        - IpProtocol: "tcp"
           FromPort: "80"
           ToPort: "80"
           CidrIp: "0.0.0.0/0"

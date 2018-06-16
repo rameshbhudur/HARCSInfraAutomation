@@ -5,7 +5,7 @@ subnet_id:
   - subnet-53c6161a
   - subnet-f6ae0f91
 ec2_keypair: MyWebServer
-instance_count: 2
+instance_count: 1
 db_subnets:
   - subnet-2e4c7277
   - subnet-53c6161a
