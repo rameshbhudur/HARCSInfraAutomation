@@ -61,12 +61,12 @@ Resources:
   EC2InstanceSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties: 
-      GroupDescription: "Unison-sg"
+      GroupDescription: "todobackend-sg"
       VpcId: { "Ref": "VpcId" }
       SecurityGroupIngress: 
-        - IpProtocol: "http"
-          FromPort: "80"
-          ToPort: "80"
+        - IpProtocol: "tcp"
+          FromPort: "8000"
+          ToPort: "8000"
           SourceSecurityGroupId: { "Ref": "ElbSecurityGroup" }
         - IpProtocol: "tcp"
           FromPort: "22"
@@ -95,8 +95,7 @@ Resources:
       }
       Path: "/"
       ManagedPolicyArns: 
-        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"     
-  
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   ElasticLoadBalancer:
     Type: "AWS::ElasticLoadBalancing::LoadBalancer"
     Properties:
@@ -119,10 +118,10 @@ Resources:
   ElbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: "ELB Security Group"
+      GroupDescription: "Todobackend ELB Security Group"
       VpcId: { "Ref": "VpcId" }
       SecurityGroupIngress:
-        - IpProtocol: "http"
+        - IpProtocol: "tcp"
           FromPort: "80"
           ToPort: "80"
           CidrIp: "0.0.0.0/0"
