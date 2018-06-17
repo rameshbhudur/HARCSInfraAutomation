@@ -4,6 +4,8 @@
   connection: local
   gather_facts: yes
   become: yes
+  become_method: sudo
+  become_user: root
   environment:
     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') | default('ap-southeast-2', true) }}"
   tasks:
