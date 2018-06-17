@@ -7,7 +7,7 @@
 - name: Install git
   yum: name={{ item }} state=installed
   with_items:
-   - git
+    - git
 
 - name: http service state
   service: name=httpd state=started enabled=yes
