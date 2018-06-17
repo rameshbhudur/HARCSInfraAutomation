@@ -28,6 +28,18 @@ Parameters:
     Type: "String"
     Description: "The RDS database password"
     NoEcho: "true"
+  AnsiblePlaybook:
+    Default: "tasks/app_deploy.yml"
+    Type: "String"
+    Description: "The Ansible playbook to use"
+  AnsibleRepository:
+    Default: "https://github.com/rameshbhudur/HARCSInfraAutomation.git"
+    Type: "String"
+    Description: "The git repository of Ansible playbooks"
+  AnsibleCheckout:
+    Default: "master"
+    Type: "String"
+    Description: "The branch/tag/commit to checkout"
 
 # Stack Resources
 Resources:
@@ -55,7 +67,13 @@ Resources:
       UserData: {
         "Fn::Base64": { "Fn::Join": ["", [
           "#!/bin/bash\n",
-          "yum update -y"
+          "yum update -y\n",
+          "yum install epel-release -y\n",
+          "yum install -y ansible git\n",
+          "echo \"localhost ansible_connection=local\" > /etc/ansible/hosts\n",
+          "ansible-pull -U ", {"Ref": "AnsibleRepository"},
+          " -C ", {"Ref": "AnsibleCheckout"},
+          " ", {"Ref": "AnsiblePlaybook"}
         ] ] }
       }
   EC2InstanceSecurityGroup:

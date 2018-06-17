@@ -13,4 +13,4 @@
   service: name=httpd state=started enabled=yes
 
 - name: Copy the code from repository
-  git: repo={{ repository }} dest=/var/www/html/
+  git: repo={{ apprepository }} dest=/var/www/html/
