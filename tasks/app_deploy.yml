@@ -3,18 +3,14 @@
   yum: name={{ item }} state=present
   with_items:
     - httpd
-  sudo: yes
 
 - name: Install git
   yum: name={{ item }} state=installed
   with_items:
     - git
-  sudo: yes
 
 - name: http service state
   service: name=httpd state=started enabled=yes
-  sudo: yes
 
 - name: Copy the code from repository
   git: repo={{ apprepository }} dest=/var/www/html/
-  sudo: yes

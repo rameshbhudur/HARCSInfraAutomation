@@ -3,6 +3,7 @@
   hosts: localhost
   connection: local
   gather_facts: yes
+  ansible_become: yes
   environment:
     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') | default('ap-southeast-2', true) }}"
   tasks:
