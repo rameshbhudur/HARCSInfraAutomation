@@ -2,7 +2,6 @@
 - name: Unison Deployment Playbook
   hosts: localhost
   connection: local
-  remote_user: '{{ ansible_env.USER }}'
   gather_facts: yes
   environment:
     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') | default('ap-southeast-2', true) }}"
