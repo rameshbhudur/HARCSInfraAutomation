@@ -10,3 +10,10 @@ virtualenv venv
 source venv/bin/activate
 pip install .
 which ansible
+
+
+Play Commands
+Validation Command
+sudo ansible-playbook "/var/lib/jenkins/workspace/UnisonDeploy/site.yml" --check --extra-vars "apprepository=https://github.com/rameshbhudur/SampleJavaApplication.git"
+run Command
+sudo ansible-playbook "/var/lib/jenkins/workspace/UnisonDeploy/site.yml" --extra-vars "apprepository=https://github.com/rameshbhudur/SampleJavaApplication.git"
