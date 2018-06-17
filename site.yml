@@ -9,4 +9,4 @@
   environment:
     AWS_DEFAULT_REGION: "{{ lookup('env', 'AWS_DEFAULT_REGION') | default('ap-southeast-2', true) }}"
   tasks:
-    - include: tasks/app_deploy.yml
+    - include: tasks/create_stack.yml
