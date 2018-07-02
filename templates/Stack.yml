@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Unison Stack"
+Description: "Two-tier application Stack"
 
 # Stack Parameters
 Parameters:

@@ -1,0 +1,8 @@
+
+Install-WindowsFeature -Name NFS-Client
+
+mount -o nolock 172.31.12.88:/bellamra-inbounddata D:
+
+Assign S3Readlony role to EC2 Instance
+
+aws s3 cp s3://bellamra-inbounddata/TestFile.txt c:\test.txt

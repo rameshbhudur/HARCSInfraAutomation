@@ -11,6 +11,6 @@ db_subnets:
   - subnet-53c6161a
   - subnet-f6ae0f91
 db_availability_zone: ap-southeast-2a
-db_username: unison
-db_password: Henith*11
-repository: https://github.com/rameshbhudur/SampleJavaApplication.git
+db_username: twotierdbaccount
+db_password: TwotierDbAccount
+apprepository: https://github.com/rameshbhudur/SampleJavaApplication.git

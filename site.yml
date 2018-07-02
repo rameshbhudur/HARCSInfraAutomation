@@ -1,5 +1,5 @@
 ---
-- name: Unison Deployment Playbook
+- name: Two Tier Application Deployment Playbook
   hosts: localhost
   connection: local
   gather_facts: yes
