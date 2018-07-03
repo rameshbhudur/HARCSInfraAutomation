@@ -1,7 +1,7 @@
 ---
 - name: create/update stack
   cloudformation:
-    stack_name: Unison
+    stack_name: TwoTierApplication
     state: present
     template: templates/Stack.yml
     template_format: yaml
