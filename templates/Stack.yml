@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Two-tier application Stack"
+Description: "Two-tier application Stack Deployment"
 
 # Stack Parameters
 Parameters:
