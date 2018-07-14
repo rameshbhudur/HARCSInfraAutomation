@@ -1,0 +1,3 @@
+aws s3 cp C:/Ramesh/AWS/HARCSInfraAutomation/Setup/S3Commands.txt s3://bellamra-inbounddata/Inbound/test2.txt
+
+aws s3 mv s3://bellamra-inbounddata/Inbound/test2.txt s3://bellamra-inbounddata/Archive/test2.txt 

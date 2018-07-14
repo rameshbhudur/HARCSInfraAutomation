@@ -1,0 +1,26 @@
+{
+  "variables": {
+    "access_key": "AKIAJFYGJX3HE3PIMGPQ",
+    "secret_key": "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"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `access_key`}}",
+    "secret_key": "{{user `secret_key`}}",
+    "region": "ap-southeast-2",
+    "source_ami": "ami-67589505",
+    "instance_type": "t2.micro",
+    "ssh_username": "ec2-user",
+    "ami_name": "Apache_Image {{timestamp}}"
+  }],
+  "provisioners": [
+    {
+			"type": "shell",
+			"script": "ansible.sh"
+		},
+		{
+			"type": "ansible-local",
+			"playbook_file": "./playbook.yml"
+		}
+  ]
+}

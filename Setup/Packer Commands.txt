@@ -1,0 +1,5 @@
+packer build template.json
+
+packer build -var 'variablename=value' template json.
+
+packer build -var-file=variables.json template.json 

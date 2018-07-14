@@ -1,0 +1,9 @@
+- hosts: all
+  sudo: yes
+  tasks:
+    - name: Install Apache web server
+      yum: name={{ item }} state=present
+      with_items:
+        - httpd
+    - name: ensure apache is running
+      service: name=httpd state=started enabled=yes
