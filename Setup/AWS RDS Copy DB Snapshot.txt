@@ -1,0 +1,4 @@
+aws rds copy-db-snapshot ^
+	--source-db-snapshot-identifier arn:aws:rds:ap-southeast-2:212123347960:snapshot:mysnapshotencrypted ^
+	--target-db-snapshot-identifier mydbsnapshotcopynonprod ^
+	--kms-key-id arn:aws:kms:ap-southeast-2:130578733051:key/e88cc830-820a-4156-b7cb-97ebb55caac0 --profile Personal
