@@ -1,0 +1,76 @@
+az group create --name WebServerResourceGroup --location eastus
+
+az vm create \
+  --resource-group WebServerResourceGroup \
+  --name WebServer1 \
+  --image UbuntuLTS \
+  --admin-username azureuser \
+  --generate-ssh-keys
+
+"privateIpAddress": "10.0.0.4",
+  "publicIpAddress": "137.117.69.139",
+
+az vm open-port --port 80 --resource-group WebServerResourceGroup --name WebServer1
+
+ssh azureuser@137.117.69.139
+
+sudo apt-get -y update
+
+sudo apt-get -y install nginx
+
+az group delete --name WebServerResourceGroup 
+
+POWERSHELL COMMANDS
+New-AzureRmResourceGroup -Name "WebServerResourceGroup" -Location "EastUS"
+
+# Create a subnet configuration
+$subnetConfig = New-AzureRmVirtualNetworkSubnetConfig -Name "WebServerSubnet" -AddressPrefix 192.168.1.0/24
+
+# Create a virtual network
+$vnet = New-AzureRmVirtualNetwork -ResourceGroupName "WebServerResourceGroup" -Location "EastUS" `
+-Name "WebAppVNET" -AddressPrefix 192.168.0.0/16 -Subnet $subnetConfig
+
+# Create a public IP address and specify a DNS name
+$pip = New-AzureRmPublicIpAddress -ResourceGroupName "WebServerResourceGroup" -Location "EastUS" `
+-AllocationMethod Static -IdleTimeoutInMinutes 4 -Name "WebServerpublicdns$(Get-Random)"
+
+# Create an inbound network security group rule for port 22
+$nsgRuleSSH = New-AzureRmNetworkSecurityRuleConfig -Name "WebNetworkSecurityGroupRuleSSH"  -Protocol "Tcp" `
+-Direction "Inbound" -Priority 1000 -SourceAddressPrefix * -SourcePortRange * -DestinationAddressPrefix * `
+-DestinationPortRange 22 -Access "Allow"
+
+# Create an inbound network security group rule for port 80
+$nsgRuleWeb = New-AzureRmNetworkSecurityRuleConfig -Name "WebNetworkSecurityGroupRuleWWW"  -Protocol "Tcp" `
+-Direction "Inbound" -Priority 1001 -SourceAddressPrefix * -SourcePortRange * -DestinationAddressPrefix * `
+-DestinationPortRange 80 -Access "Allow"
+
+# Create a network security group
+$nsg = New-AzureRmNetworkSecurityGroup -ResourceGroupName "WebServerResourceGroup" -Location "EastUS" `
+-Name "WebNetworkSecurityGroup" -SecurityRules $nsgRuleSSH,$nsgRuleWeb
+
+# Create a virtual network card and associate with public IP address and NSG
+$nic = New-AzureRmNetworkInterface -Name "WebNic" -ResourceGroupName "WebServerResourceGroup" -Location "EastUS" `
+-SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $pip.Id -NetworkSecurityGroupId $nsg.Id
+
+
+# Define a credential object
+$securePassword = ConvertTo-SecureString ' ' -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential ("azureuser", $securePassword)
+
+# Create a virtual machine configuration
+$vmConfig = New-AzureRmVMConfig -VMName "WebServer1" -VMSize "Standard_D1" | `
+Set-AzureRmVMOperatingSystem -Linux -ComputerName "WebServer1" -Credential $cred -DisablePasswordAuthentication | `
+Set-AzureRmVMSourceImage -PublisherName "Canonical" -Offer "UbuntuServer" -Skus "16.04-LTS" -Version "latest" | `
+Add-AzureRmVMNetworkInterface -Id $nic.Id
+
+# Configure SSH Keys
+$sshPublicKey = Get-Content "$env:USERPROFILE\.ssh\id_rsa.pub"
+Add-AzureRmVMSshPublicKey -VM $vmconfig -KeyData $sshPublicKey -Path "/home/azureuser/.ssh/authorized_keys"
+
+New-AzureRmVM -ResourceGroupName "WebServerResourceGroup" -Location eastus -VM $vmConfig
+
+az vm image list --output table
+
+
+
+	

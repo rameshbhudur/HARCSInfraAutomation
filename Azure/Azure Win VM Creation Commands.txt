@@ -1,0 +1,19 @@
+az group create --name WinWebResourceGroup --location eastus
+
+
+az vm create \
+    --resource-group WinWebResourceGroup  \
+    --name WinWebServer1 \
+    --image win2016datacenter \
+    --admin-username azureuser \
+    --admin-password myPassword12
+
+"publicIpAddress": "13.68.170.241",
+
+az vm open-port --port 80 --resource-group WinWebResourceGroup --name WinWebServer1 
+
+mstsc /v:13.68.170.241
+
+Install-WindowsFeature -name Web-Server -IncludeManagementTools
+
+az group delete --name WinWebResourceGroup 
